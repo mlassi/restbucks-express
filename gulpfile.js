@@ -6,7 +6,7 @@ var gulp = require('gulp'),
     nodemon = require('gulp-nodemon');
 
 gulp.task('mocha', function() {
-    return gulp.src(['app/**/*.js'], {read:false})
+    return gulp.src(['test/**/*.js'], {read:false})
         .pipe(mocha({reporter: 'list'}))
         .on('error', gutil.log);
 });
@@ -26,7 +26,7 @@ gulp.task('nodemon', function() {
 
 gulp.task('watch-mocha', function() {
     gulp.run('mocha');
-    gulp.watch(['./tests/**/*.js', 'app/**/*.js'], ['mocha']);
+    gulp.watch(['./test/**/*.js', 'app/**/*.js'], ['mocha']);
 });
 
 gulp.task('default', ['watch-mocha']);

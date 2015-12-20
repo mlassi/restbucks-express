@@ -2,6 +2,7 @@ const orderController = function (Order) {
 
     const post = function (req, res) {
         var order = new Order();
+
         order.save(function (err) {
             if(err) {
                 res.status(500);
@@ -10,7 +11,6 @@ const orderController = function (Order) {
                 res.status(201);
             }
         });
-
         res.send(order);
     }
 

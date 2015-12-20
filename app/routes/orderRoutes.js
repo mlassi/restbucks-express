@@ -1,10 +1,10 @@
 const express = require('express');
-const Order = require('../models/orderModel');
+const orderModel = require('../models/orderModel');
 
 const routes = function(){
     const orderRouter = express.Router();
 
-    const orderController = require('../controllers/orderController')(Order);
+    const orderController = require('../controllers/orderController')(orderModel.Order);
     orderRouter.route('/')
         .post(orderController.post);
 

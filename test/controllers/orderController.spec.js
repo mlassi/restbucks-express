@@ -1,17 +1,17 @@
 'use strict';
 
 const sinon = require('sinon'),
-    chai = require('chai'),
-    expect = chai.expect,
-    mongoose = require('mongoose');
+    chai = require('chai');
 
 chai.should();
 
 describe('Order Controller', function () {
 
-    let req, res;
+    let req, res, models, saveStub;
 
     beforeEach(function() {
+        models = require('../../app/models/orderModel');
+        saveStub = sinon.stub();
         req = res = {};
         req.body = sinon.spy();
         res.status = sinon.spy();
@@ -20,8 +20,12 @@ describe('Order Controller', function () {
 
     describe('ordering a beverage', function () {
 
-        xit('should return status 201 when the order was successful', function (done) {
-            const Order = function(order) {this.save = function(){return null}};
+        it('should return status 201 when the order was successful', sinon.test(function (done) {
+            saveStub.yields(null);
+            const Order = this.stub(models, 'Order');
+            Order.returns({
+                save: saveStub
+            });
             const ctrl = require('../../app/controllers/orderController')(Order);
 
             ctrl.post(req, res);
@@ -31,16 +35,25 @@ describe('Order Controller', function () {
                 done();
             });
 
-        });
+        }));
 
-        xit('should save an order', function() {
-            const OrderModel = mongoose.model('Order');
+        it('should save an order', sinon.test(function(done) {
+            saveStub.yields(null);
+            const Order = this.stub(models, 'Order');
+            Order.returns({
+                save: saveStub
+            });
 
-            const ctrl = require('../../app/controllers/orderController')(OrderModel);
+            const ctrl = require('../../app/controllers/orderController')(Order);
             ctrl.post(req, res);
 
-            res.send.called;
-        });
+            process.nextTick(function () {
+                sinon.assert.calledOnce(saveStub);
+                done();
+            });
+
+
+        }));
 
         xit('should send http status 500 when an error occurs during save', function(done) {
             const Order = function(order) {this.save = function() { return 'error';}};

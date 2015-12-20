@@ -7,5 +7,4 @@ const orderModel = new Schema({
     status: {type: String, default: 'unpaid'}
 });
 
-//module.exports = mongoose.model('Order', orderModel);
 module.exports.Order = mongoose.model('Order', orderModel);

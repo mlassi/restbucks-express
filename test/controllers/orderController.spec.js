@@ -55,8 +55,13 @@ describe('Order Controller', function () {
 
         }));
 
-        xit('should send http status 500 when an error occurs during save', function(done) {
-            const Order = function(order) {this.save = function() { return 'error';}};
+        it('should send http status 500 when an error occurs during save', sinon.test(function(done) {
+            saveStub.yields({});
+            const Order = this.stub(models, 'Order');
+            Order.returns({
+                save: saveStub
+            });
+
             const ctrl = require('../../app/controllers/orderController')(Order);
 
             ctrl.post(req, res);
@@ -66,6 +71,6 @@ describe('Order Controller', function () {
                 done();
             });
 
-        });
+        }));
     });
 });

@@ -1,0 +1,9 @@
+#!/bin/sh
+
+gulp mocha
+
+if [ "$?" != "0" ] ; then
+    echo "Test failure. Commit aborted. Fix tests before committing code."
+
+    exit 1
+fi

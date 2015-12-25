@@ -18,15 +18,20 @@ describe('Order Controller', function () {
         res.send = sinon.spy();
     });
 
+    function setupOrderCtrl(sandbox, saveYieldValue) {
+        saveStub.yields(saveYieldValue);
+        const Order = sandbox.stub(models, 'Order');
+        Order.returns({
+            save: saveStub
+        });
+        const ctrl = require('../../app/controllers/orderController')(Order);
+        return ctrl;
+    }
+
     describe('ordering a beverage', function () {
 
         it('should return status 201 when the order was successful', sinon.test(function (done) {
-            saveStub.yields(null);
-            const Order = this.stub(models, 'Order');
-            Order.returns({
-                save: saveStub
-            });
-            const ctrl = require('../../app/controllers/orderController')(Order);
+            const ctrl = setupOrderCtrl(this, null);
 
             ctrl.post(req, res);
 
@@ -35,12 +40,7 @@ describe('Order Controller', function () {
         }));
 
         it('should not send order back if it could not be saved', sinon.test(function (done) {
-            saveStub.yields({});
-            const Order = this.stub(models, 'Order');
-            Order.returns({
-                save: saveStub
-            });
-            const ctrl = require('../../app/controllers/orderController')(Order);
+            const ctrl = setupOrderCtrl(this, {});
 
             ctrl.post(req, res);
 
@@ -51,13 +51,8 @@ describe('Order Controller', function () {
 
 
         it('should save an order', sinon.test(function(done) {
-            saveStub.yields(null);
-            const Order = this.stub(models, 'Order');
-            Order.returns({
-                save: saveStub
-            });
+            const ctrl = setupOrderCtrl(this, null);
 
-            const ctrl = require('../../app/controllers/orderController')(Order);
             ctrl.post(req, res);
 
             sinon.assert.calledOnce(saveStub);
@@ -65,13 +60,7 @@ describe('Order Controller', function () {
         }));
 
         it('should send http status 500 when an error occurs during save', sinon.test(function(done) {
-            saveStub.yields({});
-            const Order = this.stub(models, 'Order');
-            Order.returns({
-                save: saveStub
-            });
-
-            const ctrl = require('../../app/controllers/orderController')(Order);
+            const ctrl = setupOrderCtrl(this, {});
 
             ctrl.post(req, res);
 

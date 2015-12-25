@@ -1,12 +1,17 @@
 const orderController = function (Order) {
 
     const post = function (req, res) {
-        var order = new Order();
+        var order = new Order(req.body);
 
         order.save(function (err) {
-            err ? res.status(500) : res.status(201);
+            if(err) {
+                res.status(500);
+            }
+            else {
+                res.status(201);
+                res.send(order);
+            }
         });
-        res.send(order);
     }
 
     return {

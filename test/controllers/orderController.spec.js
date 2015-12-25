@@ -30,12 +30,25 @@ describe('Order Controller', function () {
 
             ctrl.post(req, res);
 
-            process.nextTick(function () {
-                res.status.calledWith(201).should.be.true;
-                done();
+            res.status.calledWith(201).should.be.true;
+            done();
+        }));
+
+        it('should not send order back if it could not be saved', sinon.test(function (done) {
+            saveStub.yields({});
+            const Order = this.stub(models, 'Order');
+            Order.returns({
+                save: saveStub
             });
+            const ctrl = require('../../app/controllers/orderController')(Order);
+
+            ctrl.post(req, res);
+
+            res.send.called.should.be.false;
+            done();
 
         }));
+
 
         it('should save an order', sinon.test(function(done) {
             saveStub.yields(null);
@@ -47,12 +60,8 @@ describe('Order Controller', function () {
             const ctrl = require('../../app/controllers/orderController')(Order);
             ctrl.post(req, res);
 
-            process.nextTick(function () {
-                sinon.assert.calledOnce(saveStub);
-                done();
-            });
-
-
+            sinon.assert.calledOnce(saveStub);
+            done();
         }));
 
         it('should send http status 500 when an error occurs during save', sinon.test(function(done) {
@@ -66,10 +75,8 @@ describe('Order Controller', function () {
 
             ctrl.post(req, res);
 
-            process.nextTick(function () {
-                res.status.calledWith(500).should.be.true;
-                done();
-            });
+            res.status.calledWith(500).should.be.true;
+            done();
 
         }));
     });

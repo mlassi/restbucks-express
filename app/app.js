@@ -8,6 +8,11 @@ const port = process.env.PORT || 3000;
 
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
+app.use(function(req, res, next) {
+    req.requestedURI = req.protocol + "://" + req.get('host') + req.originalUrl;
+    return next();
+});
+
 
 const homeRouter = require('./routes/homeRoutes')();
 const orderRouter = require('./routes/orderRoutes')();

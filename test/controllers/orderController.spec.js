@@ -1,31 +1,37 @@
 'use strict';
 
 const sinon = require('sinon'),
-    chai = require('chai');
+    chai = require('chai'),
+    sinonChai = require('sinon-chai'),
+    expect = require('chai').expect;
 
-chai.should();
+chai.use(sinonChai);
 
 describe('Order Controller', function () {
 
     let req, res, models, saveStub;
 
-    beforeEach(function() {
+    beforeEach(function () {
         models = require('../../app/models/orderModel');
         saveStub = sinon.stub();
-        req = res = {};
-        req.requestedURI = '/foo/bar'
-        req.body = sinon.spy();
-        res.status = sinon.spy();
-        res.send = sinon.spy();
-        res.location = sinon.spy();
+        req = {
+            requestedURI: '/foo/bar',
+            body: sinon.spy(),
+            status: sinon.spy()
+        };
+        res = {
+            status: sinon.spy(),
+            send: sinon.spy(),
+            location: sinon.spy()
+        };
     });
 
     function setupOrderCtrl(sandbox, saveYieldValue) {
         saveStub.yields(saveYieldValue);
-        var Order = sandbox.stub(models, 'Order');
-        Order.prototype._id = 123;
+        const Order = sandbox.stub(models, 'Order');
         Order.returns({
-            save: saveStub
+            save: saveStub,
+            _id: 123
         });
         const ctrl = require('../../app/controllers/orderController')(Order);
         return {
@@ -38,10 +44,11 @@ describe('Order Controller', function () {
     describe('ordering a beverage', function () {
 
         it('should return status 201 when the order was successful', sinon.test(function (done) {
+            const expected = 201;
             const mockOrderCtrl = setupOrderCtrl(this, null);
             mockOrderCtrl.controller.post(req, res);
 
-            res.status.calledWith(201).should.be.true;
+            expect(res.status).to.have.been.calledWith(expected);
             done();
         }));
 
@@ -55,7 +62,7 @@ describe('Order Controller', function () {
         }));
 
 
-        it('should save an order', sinon.test(function(done) {
+        it('should save an order', sinon.test(function (done) {
             const mockOrderCtrl = setupOrderCtrl(this, null);
 
             mockOrderCtrl.controller.post(req, res);
@@ -64,26 +71,27 @@ describe('Order Controller', function () {
             done();
         }));
 
-        it('should send http status 500 when an error occurs during save', sinon.test(function(done) {
+        it('should send http status 500 when an error occurs during save', sinon.test(function (done) {
+            const expected = 500;
             const mockOrderCtrl = setupOrderCtrl(this, {});
 
             mockOrderCtrl.controller.post(req, res);
 
-            res.status.calledWith(500).should.be.true;
+            expect(res.status).to.have.been.calledWith(expected);
             done();
 
         }));
 
-        it.skip('should set the location response with the entity id', sinon.test(function(done) {
+        it('should set the location response with the entity id', sinon.test(function (done) {
+            const expected = '/foo/bar/123';
             const mockOrderCtrl = setupOrderCtrl(this, null);
 
             mockOrderCtrl.controller.post(req, res);
 
             //process.nextTick(function () {
-                res.location.calledWith('foo/bar/123').should.be.true;
-                done();
-           // })
-
+            expect(res.location).to.have.been.calledWith(expected);
+            done();
+            // })
 
         }));
     });

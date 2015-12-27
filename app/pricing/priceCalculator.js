@@ -5,7 +5,7 @@ const priceCalculator = function () {
     'use strict';
 
     function calculate(order) {
-        return order._doc.items.reduce(function (total, item) {
+        return _.reduce(order._doc.items, function (total, item) {
 
             total += findPrice(item) * item.quantity;
 

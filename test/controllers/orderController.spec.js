@@ -4,13 +4,13 @@ const sinon = require('sinon'),
     chai = require('chai'),
     sinonChai = require('sinon-chai'),
     expect = require('chai').expect;
-
 chai.use(sinonChai);
+
+sinon.defaultConfig.useFakeTimers = false;
 
 describe('Order Controller', function () {
 
     let req, res, models, saveStub;
-
     beforeEach(function () {
         models = require('../../app/models/orderModel');
         saveStub = sinon.stub();
@@ -38,11 +38,9 @@ describe('Order Controller', function () {
             controller: ctrl,
             order: Order
         }
-        return ctrl;
     }
 
     describe('ordering a beverage', function () {
-
         it('should return status 201 when the order was successful', sinon.test(function (done) {
             const expected = 201;
             const mockOrderCtrl = setupOrderCtrl(this, null);
@@ -92,7 +90,6 @@ describe('Order Controller', function () {
             expect(res.location).to.have.been.calledWith(expected);
             done();
             // })
-
         }));
     });
 });

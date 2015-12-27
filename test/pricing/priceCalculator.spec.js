@@ -50,6 +50,16 @@ describe('Price Calculator', function () {
 
     });
 
+    describe('item not found in price list', function () {
 
+        it('should throw error if the item can\t be found in the price list', function () {
+
+            order._doc.items.push(createItem('foo', 1, 'small'));
+
+            expect(function() {
+                priceCalculator.calculate(order);
+            }).to.throw(Error, /could not find price for item name foo and size small/);
+        });
+    });
 
 });

@@ -2,6 +2,7 @@ const priceList = require('./priceList')();
 const _ = require('lodash');
 
 const priceCalculator = function () {
+    'use strict';
 
     function calculate(order) {
         return order._doc.items.reduce(function (total, item) {
@@ -13,9 +14,14 @@ const priceCalculator = function () {
     }
 
     function findPrice(item) {
-        return _(priceList).findWhere(function (priceItem) {
-            return priceItem.name === item._doc.name && priceItem.size === item._doc.size;
-        }).cost;
+        const priceListItem = _.filter(priceList, function(priceItem) {
+             return priceItem.name === item._doc.name && priceItem.size === item._doc.size;
+        });
+
+        if(priceListItem.length === 0) {
+            throw new Error(`could not find price for item name ${item._doc.name} and size ${item._doc.size}`);
+        }
+        return priceListItem[0].cost;
     }
 
     return {

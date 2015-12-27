@@ -9,22 +9,37 @@ chai.use(sinonChai);
 
 describe('Price Calculator', function () {
 
-    let models;
+    let order;
 
     beforeEach(function () {
-        models = require('../../app/models/orderModel');
+        const model = require('../../app/models/orderModel');
+        order = new model.Order();
+    });
+
+    function createItem(name, quantity, size) {
+        return {name: name, quantity: quantity, size: size};
+    }
+
+    describe('small lattes', function () {
+        it('should calculate the price for one small latte', function () {
+            const expected = 2;
+            order._doc.items.push(createItem('latte', 1, 'small'));
+
+            const actual = priceCalculator.calculate(order);
+
+            expect(actual).to.equal(expected);
+        });
+
+        it('should calculate the price for five small lattes', function () {
+            const expected = 10;
+            order._doc.items.push(createItem('latte', 5, 'small'));
+
+            const actual = priceCalculator.calculate(order);
+
+            expect(actual).to.equal(expected);
+        });
     });
 
 
-    it('should calculate the price for one small latte', function () {
-        const expected = 2;
-        const order = new models.Order();
-        order._doc.items.push({name: 'latte', quantity:1, size: 'small'});
-
-        const actual = priceCalculator.calculate(order);
-
-        expect(actual).to.equal(expected);
-
-    });
 
 });

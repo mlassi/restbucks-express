@@ -38,6 +38,16 @@ describe('Price Calculator', function () {
 
             expect(actual).to.equal(expected);
         });
+
+        it('should calculate the price for five small lattes as two separate items', function () {
+            const expected = 20;
+            order._doc.items.push(createItem('latte', 5, 'small'), createItem('latte', 5, 'small'));
+
+            const actual = priceCalculator.calculate(order);
+
+            expect(actual).to.equal(expected);
+        });
+
     });
 
 

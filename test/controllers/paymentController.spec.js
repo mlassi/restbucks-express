@@ -14,16 +14,6 @@ describe('Payment Controller', function () {
 
     function setupOrderCtrl(sandbox, saveYieldValue) {
         saveStub = sinon.stub();
-        req = {
-            requestedURI: '/foo/bar',
-            body: sinon.spy(),
-            status: sinon.spy()
-        };
-        res = {
-            status: sinon.spy(),
-            send: sinon.spy(),
-            location: sinon.spy()
-        };
         saveStub.yields(saveYieldValue);
         const Order = sandbox.stub(models, 'Order');
         Order.returns({
@@ -31,6 +21,17 @@ describe('Payment Controller', function () {
             _id: 123,
             _doc: {cost: 0}
         });
+        req = {
+            requestedURI: '/foo/bar',
+            body: {order: new Order()},
+            status: sinon.spy()
+        };
+        res = {
+            status: sinon.spy(),
+            send: sinon.spy(),
+            location: sinon.spy()
+        };
+
         const ctrl = require('../../app/controllers/paymentController')(Order);
         return {
             controller: ctrl,

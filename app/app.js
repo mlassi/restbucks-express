@@ -16,9 +16,11 @@ app.use(function(req, res, next) {
 
 const homeRouter = require('./routes/homeRoutes')();
 const orderRouter = require('./routes/orderRoutes')();
+const paymentRouter = require('./routes/paymentRoutes')();
 
 app.use('/api/home', homeRouter);
 app.use('/api/order', orderRouter);
+app.use('/api/payment', paymentRouter);
 
 
 app.listen(port, function(){

@@ -10,6 +10,7 @@ const paymentController = function (Order) {
             }
             else {
                 res.status(200);
+                res.location(`${req.requestedURI}/${order._id}`)
             }
         });
 

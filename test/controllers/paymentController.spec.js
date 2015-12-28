@@ -71,6 +71,16 @@ describe('Payment Controller', function () {
             done();
         }));
 
+        it('should set the location response with the entity id', sinon.test(function (done) {
+            const expected = '/foo/bar/123';
+            const mockOrderCtrl = setupOrderCtrl(this, null);
+
+            mockOrderCtrl.controller.post(req, res);
+
+            expect(res.location).to.have.been.calledWith(expected);
+            done();
+        }));
+
     });
 
 });

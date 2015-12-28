@@ -16,11 +16,11 @@ const orderController = function (Order, priceCalculator) {
                 res.send(order);
             }
         });
-    }
+    };
 
     return {
         post: post
     }
-}
+};
 
 module.exports = orderController;

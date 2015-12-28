@@ -61,6 +61,16 @@ describe('Payment Controller', function () {
             done();
         }));
 
+        it('should send http status 500 when an error occurs during save', sinon.test(function (done) {
+            const expected = 500;
+            const mockOrderCtrl = setupOrderCtrl(this, {});
+
+            mockOrderCtrl.controller.post(req, res);
+
+            expect(res.status).to.have.been.calledWith(expected);
+            done();
+        }));
+
     });
 
 });

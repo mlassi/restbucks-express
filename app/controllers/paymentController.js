@@ -5,10 +5,14 @@ const paymentController = function (Order) {
         const order = new Order(req.body);
 
         order.save(function (err) {
-
+            if (err) {
+                res.status(500);
+            }
+            else {
+                res.status(200);
+            }
         });
 
-        res.status(200);
     };
 
     return {

@@ -33,7 +33,8 @@ describe('Order Controller', function () {
         const Order = sandbox.stub(models, 'Order');
         Order.returns({
             save: saveStub,
-            _id: 123
+            _id: 123,
+            _doc: {cost: 0}
         });
         const ctrl = require('../../app/controllers/orderController')(Order, priceCalcStub);
         return {
@@ -102,7 +103,7 @@ describe('Order Controller', function () {
 
             sinon.assert.calledOnce(priceCalcStub.calculate);
             done();
-
         }));
+
     });
 });

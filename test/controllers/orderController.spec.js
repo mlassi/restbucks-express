@@ -10,9 +10,14 @@ sinon.defaultConfig.useFakeTimers = false;
 
 describe('Order Controller', function () {
 
-    let req, res, models, saveStub;
-    beforeEach(function () {
-        models = require('../../app/models/orderModel');
+    let req, res, models, saveStub, priceCalcStub;
+
+    models = require('../../app/models/orderModel');
+
+    function setupOrderCtrl(sandbox, saveYieldValue) {
+        priceCalcStub = {
+            calculate: sinon.spy()
+        };
         saveStub = sinon.stub();
         req = {
             requestedURI: '/foo/bar',
@@ -24,16 +29,13 @@ describe('Order Controller', function () {
             send: sinon.spy(),
             location: sinon.spy()
         };
-    });
-
-    function setupOrderCtrl(sandbox, saveYieldValue) {
         saveStub.yields(saveYieldValue);
         const Order = sandbox.stub(models, 'Order');
         Order.returns({
             save: saveStub,
             _id: 123
         });
-        const ctrl = require('../../app/controllers/orderController')(Order);
+        const ctrl = require('../../app/controllers/orderController')(Order, priceCalcStub);
         return {
             controller: ctrl,
             order: Order
@@ -44,6 +46,7 @@ describe('Order Controller', function () {
         it('should return status 201 when the order was successful', sinon.test(function (done) {
             const expected = 201;
             const mockOrderCtrl = setupOrderCtrl(this, null);
+
             mockOrderCtrl.controller.post(req, res);
 
             expect(res.status).to.have.been.calledWith(expected);
@@ -90,6 +93,16 @@ describe('Order Controller', function () {
             expect(res.location).to.have.been.calledWith(expected);
             done();
             // })
+        }));
+
+        it('should calculate the price before saving the order', sinon.test(function(done) {
+            const mockOrderCtrl = setupOrderCtrl(this, null);
+
+            mockOrderCtrl.controller.post(req, res);
+
+            sinon.assert.calledOnce(priceCalcStub.calculate);
+            done();
+
         }));
     });
 });

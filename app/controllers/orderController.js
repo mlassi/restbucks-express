@@ -1,8 +1,11 @@
-const orderController = function (Order) {
+const orderController = function (Order, priceCalculator) {
     'use strict';
 
     const post = function (req, res) {
         var order = new Order(req.body);
+
+        priceCalculator.calculate(order);
+
         order.save(function (err) {
             if (err) {
                 res.status(500);

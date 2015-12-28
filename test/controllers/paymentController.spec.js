@@ -52,6 +52,15 @@ describe('Payment Controller', function () {
 
         }));
 
+        it('should save the updated order with the payment information', sinon.test(function (done) {
+            const mockOrderCtrl = setupOrderCtrl(this, null);
+
+            mockOrderCtrl.controller.post(req, res);
+
+            sinon.assert.calledOnce(saveStub);
+            done();
+        }));
+
     });
 
 });

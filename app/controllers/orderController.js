@@ -2,7 +2,7 @@ const orderController = function (Order, priceCalculator) {
     'use strict';
 
     const post = function (req, res) {
-        var order = new Order(req.body);
+        const order = new Order(req.body);
 
         order._doc.cost = priceCalculator.calculate(order);
 

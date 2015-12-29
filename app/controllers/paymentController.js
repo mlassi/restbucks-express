@@ -2,7 +2,8 @@ const paymentController = function (Order) {
     'use strict';
 
     const post = function (req, res) {
-        const order = req.body.order;
+        const order = req.order;
+        setPayment(req, order);
 
         order.save(function (err) {
             if (err) {
@@ -10,11 +11,21 @@ const paymentController = function (Order) {
             }
             else {
                 res.status(200);
-                res.location(`${req.requestedURI}/${order._id}`)
+                res.json(order);
             }
         });
 
     };
+
+    function setPayment(req, order) {
+        order.payment.amount = req.body.amount;
+        order.payment.cardHolderName = req.body.cardHolderName;
+        order.payment.cardNumber = req.body.cardNumber;
+        order.payment.cardType = req.body.cardType;
+        order.payment.expiryMonth = req.body.expiryMonth;
+        order.payment.expiryYear = req.body.expiryYear;
+        order.status = "paid";
+    }
 
     return {
         post: post

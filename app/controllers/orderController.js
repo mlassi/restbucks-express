@@ -4,7 +4,7 @@ const orderController = function (Order, priceCalculator) {
     const post = function (req, res) {
         const order = new Order(req.body);
 
-        order._doc.cost = priceCalculator.calculate(order);
+        order.cost = priceCalculator.calculate(order);
 
         order.save(function (err) {
             if (err) {

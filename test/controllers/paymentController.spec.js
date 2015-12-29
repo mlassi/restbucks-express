@@ -21,15 +21,27 @@ describe('Payment Controller', function () {
             _id: 123,
             _doc: {cost: 0}
         });
+        let existingOrder = new Order();
+        existingOrder.payment = {amount:0, cardHolderName: '', cardNumber: ''
+            , cardType: '', expiryMonth: '', expiryYear: ''};
+       // existingOrder.payment.am
         req = {
+            body: { amount: 0,
+                cardHolderName: 'foo',
+                cardNumber: '4111',
+                cardType: 'VISA',
+                expiryMonth: '06',
+                expiryYear: '15'
+            },
             requestedURI: '/foo/bar',
-            body: {order: new Order()},
+            order: existingOrder,
             status: sinon.spy()
         };
         res = {
             status: sinon.spy(),
             send: sinon.spy(),
-            location: sinon.spy()
+            location: sinon.spy(),
+            json: sinon.spy()
         };
 
         const ctrl = require('../../app/controllers/paymentController')(Order);
@@ -69,16 +81,6 @@ describe('Payment Controller', function () {
             mockOrderCtrl.controller.post(req, res);
 
             expect(res.status).to.have.been.calledWith(expected);
-            done();
-        }));
-
-        it('should set the location response with the entity id', sinon.test(function (done) {
-            const expected = '/foo/bar/123';
-            const mockOrderCtrl = setupOrderCtrl(this, null);
-
-            mockOrderCtrl.controller.post(req, res);
-
-            expect(res.location).to.have.been.calledWith(expected);
             done();
         }));
 

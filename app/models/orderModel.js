@@ -25,7 +25,14 @@ const orderModel = new Schema({
     location: {type: String},
     items: [itemModel],
     cost: {type: Number, default: 0},
-    payment: paymentModel,
+    payment: {
+        amount: {type: Number},
+        cardHolderName: {type: String},
+        cardNumber: {type: String},
+        expiryMonth: {type: String},
+        expiryYear: {type: String},
+        cardType: {type: String}
+    },
     status: {type: String, default: 'unpaid'}
 });
 

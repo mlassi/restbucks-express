@@ -18,8 +18,13 @@ const orderController = function (Order, priceCalculator) {
         });
     };
 
+    const get = function (req, res) {
+        res.status(200);
+    };
+
     return {
-        post: post
+        post: post,
+        get: get
     }
 };
 

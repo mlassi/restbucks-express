@@ -8,40 +8,40 @@ chai.use(sinonChai);
 
 sinon.defaultConfig.useFakeTimers = false;
 
-describe('Order Controller', function () {
+const models = require('../../app/models/orderModel');
 
-    let req, res, models, saveStub, priceCalcStub;
+let req, res, saveStub, priceCalcStub;
 
-    models = require('../../app/models/orderModel');
-
-    function setupOrderCtrl(sandbox, saveYieldValue) {
-        priceCalcStub = {
-            calculate: sinon.spy()
-        };
-        saveStub = sinon.stub();
-        req = {
-            requestedURI: '/foo/bar',
-            body: sinon.spy(),
-            status: sinon.spy()
-        };
-        res = {
-            status: sinon.spy(),
-            send: sinon.spy(),
-            location: sinon.spy()
-        };
-        saveStub.yields(saveYieldValue);
-        const Order = sandbox.stub(models, 'Order');
-        Order.returns({
-            save: saveStub,
-            _id: 123,
-            _doc: {cost: 0}
-        });
-        const ctrl = require('../../app/controllers/orderController')(Order, priceCalcStub);
-        return {
-            controller: ctrl,
-            order: Order
-        }
+function setupOrderCtrl(sandbox, saveYieldValue) {
+    priceCalcStub = {
+        calculate: sinon.spy()
+    };
+    saveStub = sinon.stub();
+    req = {
+        requestedURI: '/foo/bar',
+        body: sinon.spy(),
+        status: sinon.spy()
+    };
+    res = {
+        status: sinon.spy(),
+        send: sinon.spy(),
+        location: sinon.spy()
+    };
+    saveStub.yields(saveYieldValue);
+    const Order = sandbox.stub(models, 'Order');
+    Order.returns({
+        save: saveStub,
+        _id: 123,
+        _doc: {cost: 0}
+    });
+    const ctrl = require('../../app/controllers/orderController')(Order, priceCalcStub);
+    return {
+        controller: ctrl,
+        order: Order
     }
+}
+
+describe('Order Controller', function () {
 
     describe('ordering a beverage', function () {
         it('should return status 201 when the order was successful', sinon.test(function (done) {
@@ -102,6 +102,20 @@ describe('Order Controller', function () {
             mockOrderCtrl.controller.post(req, res);
 
             sinon.assert.calledOnce(priceCalcStub.calculate);
+            done();
+        }));
+
+    });
+
+    describe('viewing an existing order', function () {
+
+        it('should return status 200 when the order could be retrieved', sinon.test(function (done) {
+            const expected = 200;
+            const mockOrderCtrl = setupOrderCtrl(this, null);
+
+            mockOrderCtrl.controller.get(req, res);
+
+            expect(res.status).to.have.been.calledWith(expected);
             done();
         }));
 

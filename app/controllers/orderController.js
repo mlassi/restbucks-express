@@ -19,7 +19,13 @@ const orderController = function (Order, priceCalculator) {
     };
 
     const get = function (req, res) {
-        res.status(200);
+        Order.findById(req.params.orderId, function(err,order) {
+            res.status(200);
+            res.send(order);
+        });
+
+
+        //res.send();
     };
 
     return {

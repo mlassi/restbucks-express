@@ -7,6 +7,9 @@ const routes = function(){
     const orderRouter = express.Router();
 
     const orderController = require('../controllers/orderController')(orderModel.Order, priceCalculator);
+
+    orderRouter.route('/:orderId')
+        .get(orderController.get);
     orderRouter.route('/')
         .post(orderController.post);
 

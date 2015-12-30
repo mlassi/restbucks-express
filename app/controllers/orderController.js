@@ -20,12 +20,14 @@ const orderController = function (Order, priceCalculator) {
 
     const get = function (req, res) {
         Order.findById(req.params.orderId, function(err,order) {
-            res.status(200);
-            res.send(order);
+            if(err) {
+                res.status(404);
+            }
+            else {
+                res.status(200);
+                res.send(order);
+            }
         });
-
-
-        //res.send();
     };
 
     return {

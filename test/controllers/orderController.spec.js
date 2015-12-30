@@ -69,7 +69,7 @@ function setupOrderSaveCtrl(sandbox, saveYieldValue) {
     }
 }
 
-function setupOrderFindCtrl(sandbox, findValue) {
+function setupOrderFindCtrl(sandbox, err, findValue) {
 
     req = {
         requestedURI: '/foo/bar',
@@ -91,7 +91,7 @@ function setupOrderFindCtrl(sandbox, findValue) {
         findById: findStub,
         _id: 123
     });
-    findStub.yields(findValue ? null: findValue , findValue);
+    findStub.yields(err, findValue);
 
     const ctrl = require('../../app/controllers/orderController')(Order, null);
     return {
@@ -106,7 +106,7 @@ describe('Order Controller', function () {
     describe('ordering a beverage', function () {
         it('should return status 201 when the order was successful', sinon.test(function (done) {
             const expected = 201;
-            const mockOrderCtrl = setupOrderSaveCtrl(this, null, setupMiddleware);
+            const mockOrderCtrl = setupOrderSaveCtrl(this, null);
 
             mockOrderCtrl.controller.post(req, res);
 
@@ -116,7 +116,7 @@ describe('Order Controller', function () {
 
         it('should not send order back if it could not be saved', sinon.test(function (done) {
             req = null, res = null;
-            const mockOrderCtrl = setupOrderSaveCtrl(this, {}, setupMiddleware);
+            const mockOrderCtrl = setupOrderSaveCtrl(this, {});
             mockOrderCtrl.controller.post(req, res);
 
             res.send.called.should.be.false;
@@ -127,7 +127,7 @@ describe('Order Controller', function () {
 
         it('should save an order', sinon.test(function (done) {
             req = null, res = null;
-            const mockOrderCtrl = setupOrderSaveCtrl(this, null, setupMiddleware);
+            const mockOrderCtrl = setupOrderSaveCtrl(this, null);
 
             mockOrderCtrl.controller.post(req, res);
 
@@ -138,7 +138,7 @@ describe('Order Controller', function () {
         it('should send http status 500 when an error occurs during save', sinon.test(function (done) {
             req = null, res = null;
             const expected = 500;
-            const mockOrderCtrl = setupOrderSaveCtrl(this, {}, setupMiddleware);
+            const mockOrderCtrl = setupOrderSaveCtrl(this, {});
 
             mockOrderCtrl.controller.post(req, res);
 
@@ -149,7 +149,7 @@ describe('Order Controller', function () {
 
         it('should set the location response with the entity id', sinon.test(function (done) {
             const expected = '/foo/bar/123';
-            const mockOrderCtrl = setupOrderSaveCtrl(this, null, setupMiddleware);
+            const mockOrderCtrl = setupOrderSaveCtrl(this, null);
 
             mockOrderCtrl.controller.post(req, res);
 
@@ -160,7 +160,7 @@ describe('Order Controller', function () {
         }));
 
         it('should calculate the price before saving the order', sinon.test(function (done) {
-            const mockOrderCtrl = setupOrderSaveCtrl(this, null, setupMiddleware);
+            const mockOrderCtrl = setupOrderSaveCtrl(this, null);
 
             mockOrderCtrl.controller.post(req, res);
 
@@ -173,34 +173,38 @@ describe('Order Controller', function () {
     describe('viewing an existing order', function () {
 
         afterEach(function () {
-           if(findStub) {
-               findStub.restore();
-           }
+            if (findStub) {
+                findStub.restore();
+            }
         });
 
         it('should return status 200 when the order could be retrieved', sinon.test(function (done) {
             const expected = 200;
-            const mockOrderCtrl = setupOrderFindCtrl(this, {_id: 123}, setupMiddleware);
+            const mockOrderCtrl = setupOrderFindCtrl(this, null, {_id: 123});
 
             mockOrderCtrl.controller.get(req, res);
-            mockOrderCtrl.find
+
             expect(res.status).to.have.been.calledWith(expected);
             done();
         }));
 
-        it('should call return an order if it could be retrieved', sinon.test(function (done) {
-
-            var expected = {_id: 123};
-            const mockOrderCtrl = setupOrderFindCtrl(this, {_id: 123}, setupMiddleware);
+        it('should return an order if it could be retrieved', sinon.test(function (done) {
+            const expected = {_id: 123};
+            const mockOrderCtrl = setupOrderFindCtrl(this, null, expected);
 
             mockOrderCtrl.controller.get(req, res);
 
-            process.nextTick(function () {
-                //sinon.assert.calledOnce(findStub);
-                expect(res.send).to.have.been.calledWith({_id: 123});
-                done();
-            })
+            expect(res.send).to.have.been.calledWith(expected);
+            done();
+        }));
 
+        it('should return status 404 when the order could not be found', sinon.test(function (done) {
+            const expected = 404;
+            const mockOrderCtrl = setupOrderFindCtrl(this, {}, null);
+
+            mockOrderCtrl.controller.get(req, res);
+            expect(res.status).to.have.been.calledWith(expected);
+            done();
         }));
 
     });

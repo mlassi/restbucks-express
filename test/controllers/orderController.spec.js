@@ -10,9 +10,10 @@ chai.use(sinonChai);
 
 sinon.defaultConfig.useFakeTimers = false;
 
-const models = require('../../app/models/orderModel');
+const orderModels = require('../../app/models/orderModel');
+const beverageModels = require('../../app/models/beverageModel');
 
-let req, res, findStub;
+let req, res, findStub, findBeverageStub;
 
 function setupMiddleware(req, res) {
     req = {
@@ -50,7 +51,7 @@ function setupOrderSaveCtrl(sandbox, saveYieldValue) {
     };
     const saveStub = sinon.stub();
 
-    let Order = sandbox.stub(models, 'Order');
+    let Order = sandbox.stub(orderModels, 'Order');
     saveStub.yields(saveYieldValue);
 
     Order.returns({
@@ -59,7 +60,7 @@ function setupOrderSaveCtrl(sandbox, saveYieldValue) {
         _doc: {cost: 0}
     });
 
-    const ctrl = require('../../app/controllers/orderController')(Order, priceCalcStub);
+    const ctrl = require('../../app/controllers/orderController')(Order, priceCalcStub, null);
 
     return {
         controller: ctrl,
@@ -84,8 +85,8 @@ function setupOrderFindCtrl(sandbox, err, findValue) {
         json: sinon.spy()
     };
 
-    findStub = sinon.stub(models.Order, 'findById');
-    let Order = sandbox.stub(models, 'Order');
+    findStub = sinon.stub(orderModels.Order, 'findById');
+    let Order = sandbox.stub(orderModels, 'Order');
 
     Order.returns({
         findById: findStub,
@@ -93,10 +94,33 @@ function setupOrderFindCtrl(sandbox, err, findValue) {
     });
     findStub.yields(err, findValue);
 
-    const ctrl = require('../../app/controllers/orderController')(Order, null);
+    const ctrl = require('../../app/controllers/orderController')(Order, null, null);
     return {
         controller: ctrl,
         order: Order
+    }
+}
+
+function setupBeverageFindCtrl(sandbox, err, findValue) {
+
+    res = {
+        status: sinon.spy(),
+        send: sinon.spy()
+    };
+
+    findBeverageStub = sinon.stub(beverageModels.Beverage, 'find');
+    let Beverage = sandbox.stub(beverageModels, 'Beverage');
+
+    Beverage.returns({
+        find: findBeverageStub,
+        name: 'latte'
+    });
+    findBeverageStub.yields(err, findValue);
+
+    const ctrl = require('../../app/controllers/orderController')(null, null, Beverage);
+    return {
+        controller: ctrl,
+        beverage: Beverage
     }
 }
 
@@ -173,9 +197,7 @@ describe('Order Controller', function () {
     describe('viewing an existing order', function () {
 
         afterEach(function () {
-            if (findStub) {
-                findStub.restore();
-            }
+            findStub.restore();
         });
 
         it('should return status 200 when the order could be retrieved', sinon.test(function (done) {
@@ -203,6 +225,35 @@ describe('Order Controller', function () {
             const mockOrderCtrl = setupOrderFindCtrl(this, {}, null);
 
             mockOrderCtrl.controller.get(req, res);
+            expect(res.status).to.have.been.calledWith(expected);
+            done();
+        }));
+
+    });
+
+    describe('viewing existing beverages', function () {
+
+        afterEach(function () {
+            findBeverageStub.restore();
+        });
+
+        it('should return a beverage if it could be retrieved', sinon.test(function (done) {
+            const expected = {name: 'latte'};
+            const req = {};
+            const mockOrderCtrl = setupBeverageFindCtrl(this, null, expected);
+
+            mockOrderCtrl.controller.getBeverages(req, res);
+
+            expect(res.send).to.have.been.calledWith(expected);
+            done();
+        }));
+
+        it('should return status 404 when no beverages could be found', sinon.test(function (done) {
+            const expected = 404;
+            const mockOrderCtrl = setupBeverageFindCtrl(this, {}, null);
+
+            mockOrderCtrl.controller.getBeverages(req, res);
+
             expect(res.status).to.have.been.calledWith(expected);
             done();
         }));

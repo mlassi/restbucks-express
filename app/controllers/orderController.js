@@ -1,4 +1,4 @@
-const orderController = function (Order, priceCalculator) {
+const orderController = function (Order, priceCalculator, Beverage) {
     'use strict';
 
     const post = function (req, res) {
@@ -30,9 +30,22 @@ const orderController = function (Order, priceCalculator) {
         });
     };
 
+    const getBeverages = function (req, res) {
+        Beverage.find({}, function(err,beverages) {
+            if(err) {
+                res.status(404);
+            }
+            else {
+                res.status(200);
+                res.send(beverages);
+            }
+        });
+    };
+
     return {
         post: post,
-        get: get
+        get: get,
+        getBeverages: getBeverages
     }
 };
 

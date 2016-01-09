@@ -9,7 +9,7 @@ const routes = function(){
 
     const orderController = require('../controllers/orderController')(orderModel.Order, priceCalculator, beverageModel.Beverage);
 
-    orderRouter.route('/beverages')
+    orderRouter.route('/beverage')
         .get(orderController.getBeverages);
     orderRouter.route('/:orderId')
         .get(orderController.get);
